@@ -15,7 +15,14 @@ export class ProfileRepo {
   async createProfile(data: any): Promise<any> {
     let result: any = {};
     try {
-      const saveData = new this.profileModel(data);
+      const Dates = {
+        phone_number: data.phone_number,
+        username: data.username,
+        password: data.password,
+        created_date: new Date(),
+        oo: data.oo,
+      };
+      const saveData = new this.profileModel(Dates);
       const rsSaveModalHis = await saveData.save();
 
       result.res_data = rsSaveModalHis;
