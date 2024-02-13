@@ -3,7 +3,7 @@ import { ProductRepo } from './product.repo';
 
 @Injectable()
 export class ProductService {
-  constructor(private productRepo: ProductRepo) {}
+  constructor(private productRepo: ProductRepo) { }
 
   async getProductAll() {
     let result: any = {};
@@ -12,7 +12,7 @@ export class ProductService {
       result.res_code = '000';
       result.res_msg = 'success';
       result.datas = rsProfile;
-    } catch (error) {}
+    } catch (error) { }
     return result;
   }
 
@@ -30,6 +30,20 @@ export class ProductService {
         result.datas = rsProfileById;
       }
     } catch (error) {
+      console.log('error');
+    }
+    return result;
+  }
+
+  async addProductByArray(data: any[]) {
+    let result: any = {};
+    try {
+      const saveProduct = await this.productRepo.createProductByArray(data);
+      result.res_code = '000';
+      result.res_msg = 'success';
+
+    }
+    catch (error) {
       console.log('error');
     }
     return result;

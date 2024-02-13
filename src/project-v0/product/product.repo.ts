@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from 'src/model/product.model';
+import { SiteProduct } from 'src/model/site_products.model';
 
 @Injectable()
 export class ProductRepo {
   constructor(
     @InjectModel('products') private readonly productModel: Model<Product>,
+    @InjectModel('site_products') private readonly siteProductModel: Model<SiteProduct>,
   ) {}
   async getProduct() {
     return await this.productModel.find();
@@ -31,4 +33,18 @@ export class ProductRepo {
       ])
       .exec();
   }
+  async createProductByArray(data: any[]): Promise<any> {
+    let result: any = {};
+    try {
+        const products = data.map(productData => new this.siteProductModel(productData));
+        const savedProducts = await Promise.all(products.map(product => product.save()));
+        
+        result.res_data = savedProducts;
+    } catch (error) {
+        console.log(error);
+        result.error = error.message;
+    }
+    return result;
+}
+
 }
