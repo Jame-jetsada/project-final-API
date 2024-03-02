@@ -12,6 +12,38 @@ export class ProfileRepo {
     return await this.profileModel.find();
   }
 
+  async getProfileByEmpId(emp_id: String) {
+    let result:any = {};
+    try{
+      result = await this.profileModel.aggregate([
+        {
+          $match: {
+            emp_id: emp_id,
+          },
+        },
+        {
+          $project: {
+            phone_number: '$phone_number',
+            firstname: '$firstname',
+            lastname: '$lastname',
+            site_id: '$site_id',
+            site_name: '$site_name',
+            emp_id: '$emp_id',
+            emp_position: '$emp_position',
+            image : '$image',
+
+          },
+        },
+      ])
+      .exec();
+
+    }
+    catch(error){
+      console.log("Error Repo getProfileByEmpId");
+    }
+    return result;
+  }
+
   async createProfile(data: any): Promise<any> {
     let result: any = {};
     try {

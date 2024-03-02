@@ -10,6 +10,11 @@ export class ProfileController {
     return await this.profileService.getProfile();
   }
 
+  @Get('getUser-by-empid/:emp_id')
+  async getProfileByEmp_id(@Param('emp_id') emp_id: String) {
+    return await this.profileService.getProfileByEmpId(emp_id);
+  }
+
   @Get('login/:username/:password')
   async loginByusername(
     @Param('username') username: String,
