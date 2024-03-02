@@ -15,7 +15,27 @@ export class ProfileService {
       result.res_code = '000';
       result.res_msg = 'success';
       result.datas = rsProfile;
-    } catch (error) {}
+    } catch (error) {
+      
+    }
+    return result;
+  }
+
+  async getProfileByEmpId(emp_id: String) {
+    let result: any = {};
+    try {
+      const rsProfile = await this.profileRepo.getProfileByEmpId(emp_id);
+      if(rsProfile.length === 0){
+        result.res_code = 'E101';
+        result.res_msg = 'fail';
+        return result;
+      }
+      result.res_code = '000';
+      result.res_msg = 'success';
+      result.datas = rsProfile;
+    } catch (error) {
+      console.log("error getProfileByEmpId");
+    }
     return result;
   }
 
@@ -26,7 +46,7 @@ export class ProfileService {
       result.res_code = '000';
       result.res_msg = 'success';
     } catch (error) {
-      console.log('err');
+      console.log('error service ProfileUser');
     }
     return result;
   }
@@ -44,7 +64,7 @@ export class ProfileService {
         result.res_msg = 'success';
       }
     } catch (error) {
-      console.log('err');
+      console.log('error service loginByusername');
     }
     return result;
   }

@@ -23,7 +23,7 @@ export class ProductService {
 
       if (rsProfileById.length === 0) {
         result.res_code = 'E101';
-        result.res_msg = 'file';
+        result.res_msg = 'fail';
       } else {
         result.res_code = '000';
         result.res_msg = 'success';
