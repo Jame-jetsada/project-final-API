@@ -24,6 +24,7 @@ export class ProductRepo {
         {
           $project: {
             Itm_id: '$Itm_id',
+            Product_image: "$Product_image",
             Itm_Char: '$Itm_Char',
             Itm_Desc1: '$Itm_Desc1',
             Itm_Memo: '$Itm_Memo',
