@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepo } from './product.repo';
+import { CountProductsDto } from './product.dto';
 
 @Injectable()
 export class ProductService {
@@ -42,6 +43,35 @@ export class ProductService {
       result.res_code = '000';
       result.res_msg = 'success';
 
+    }
+    catch (error) {
+      console.log('error');
+    }
+    return result;
+  }
+
+  async countProduct(data: CountProductsDto){
+    let result:any = {};
+    try{ 
+      const getSiteProducts = await this.productRepo.getSiteProductsBySiteId(data.site_id, data.item_id);
+      if(!getSiteProducts){
+        result.res_code = 'E101';
+        result.res_msg = 'fail';
+      }
+      else{
+        result.res_code = '000';
+        result.res_msg = 'success';
+        result.datas = {
+          item_id: data.item_id,
+          item_desc: getSiteProducts.itm_desc1,
+          site_id: getSiteProducts.site_id,
+          site_desc: getSiteProducts.site_desc,
+          onhand_balance_qty: getSiteProducts.onhand_balance_qty,
+          item_qty: data.item_qty,
+          firstname: data.firstname,
+          lastname: data.lastname,
+        }
+      } 
     }
     catch (error) {
       console.log('error');

@@ -48,4 +48,18 @@ export class ProductRepo {
     return result;
 }
 
+async getSiteProductsBySiteId(siteId: String, itemId: String){
+  try{
+    const rs = await this.siteProductModel.findOne({
+      site_id: siteId,
+      itm_id: itemId
+    }).exec();
+    return rs;
+  }
+  catch(error) {
+    console.log("Error: " + error);
+    
+  }
+}
+
 }
