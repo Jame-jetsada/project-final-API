@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { ProfileDto } from './profile.dto';
+import { Request, Response } from 'express';
 import { ProfileService } from './profile.service';
 
 @Controller('project-v0/profile')
@@ -8,6 +9,11 @@ export class ProfileController {
   @Get()
   async getProfile() {
     return await this.profileService.getProfile();
+  }
+  @Get('getProfileByToken')
+  async getProfileByToken(@Req() req: Request, @Res() res: Response,){
+    const rs = await this.profileService.getProfileByToken(req.header('X-Authorization'));
+    return res.json(rs);
   }
 
   @Get('getUser-by-empid/:emp_id')
