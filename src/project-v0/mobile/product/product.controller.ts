@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ProductService } from './product.service';
+import { CountProductsDto } from './product.dto';
 
 @Controller('project-v0/product')
 export class ProductController {
@@ -18,6 +19,12 @@ export class ProductController {
   async addProductArray(@Body() items: any[]){
     return this.productService.addProductByArray(items);
   }
+
+  @Post('/countProduct')
+  async countProduct(@Body() data: CountProductsDto){
+    return this.productService.countProduct(data);
+  }
+
 
   // @Post('/receiveAllProducts')
   // async receiveAllProducts(@Body() data: AllProductsDto) {
