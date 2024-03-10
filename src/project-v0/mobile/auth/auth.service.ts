@@ -67,4 +67,35 @@ export class AuthService {
         }
         return result;
     }
+
+    async getloginMobile(username: String, password: String){
+        let result:any = {};
+        try{
+            const rsUser = await this.authRepo.findUserBtUsername(username);
+            if(!rsUser){
+                result.res_code = "E101";
+                result.res_msg = "fail";
+                return result;
+            }
+            const isCompare = await this.utilSarvice.compareHash(password, rsUser.password);
+            if(!isCompare){
+                result.res_code = "E102";
+                result.res_msg = "fail";
+                return result;
+            }
+            let tokenData: any ={
+                emp_id: rsUser.emp_id
+            };
+            const rsToken = await this.utilSarvice.signToken(tokenData);
+            result.res_code = "000";
+            result.res_msg = "success";
+            result.datas = {
+                Token : rsToken,
+            }
+        }
+        catch(error) {
+            console.log("error");
+        }
+        return result;
+    }
 }
