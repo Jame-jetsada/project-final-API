@@ -55,23 +55,6 @@ export class ProfileService {
     return result;
   }
 
-  async loginByusername(username: String, password: String) {
-    let result: any = {};
-    try {
-      const userConfirm = await this.profileRepo.loginUser(username, password);
-
-      if (userConfirm.length === 0) {
-        result.res_code = 'E101';
-        result.res_msg = 'fail';
-      } else {
-        result.res_code = '000';
-        result.res_msg = 'success';
-      }
-    } catch (error) {
-      console.log('error service loginByusername');
-    }
-    return result;
-  }
 
   async getProfileByToken(authToken) {
     let result: any = {};
@@ -86,7 +69,7 @@ export class ProfileService {
       const getProfile = await this.profileRepo.getProfileByEmpId(emp_id);
       result.res_code = '000';
       result.res_msg = 'success';
-      result.datas = getProfile;
+      result.datas = getProfile[0];
     }
     catch (error) {
       console.log('error service getProfileByToken');
