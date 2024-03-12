@@ -21,7 +21,6 @@ export class ProductService {
     let result: any = {};
     try {
       const rsProfileById = await this.productRepo.getProductById(id);
-
       if (rsProfileById.length === 0) {
         result.res_code = 'E101';
         result.res_msg = 'fail';
@@ -59,11 +58,9 @@ export class ProductService {
         result.res_msg = 'fail';
       }
       else{
-        result.res_code = '000';
-        result.res_msg = 'success';
-        result.datas = {
+        const saveCount = {
           item_id: data.item_id,
-          item_desc: getSiteProducts.itm_desc1,
+          item_desc1: getSiteProducts.itm_desc1,
           site_id: getSiteProducts.site_id,
           site_desc: getSiteProducts.site_desc,
           onhand_balance_qty: getSiteProducts.onhand_balance_qty,
@@ -71,6 +68,9 @@ export class ProductService {
           firstname: data.firstname,
           lastname: data.lastname,
         }
+        const savecountProduct = await this.productRepo.createCountProduct(saveCount);
+        result.res_code = '000';
+        result.res_msg = 'success';
       } 
     }
     catch (error) {

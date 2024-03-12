@@ -5,11 +5,13 @@ import { ProductRepo } from './product.repo';
 import { MongooseModule } from '@nestjs/mongoose';
 import { productSchema } from 'src/model/product.model';
 import { SiteProductSchema } from 'src/model/site_products.model';
+import { CountProductSchema } from 'src/model/count_productg';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'products', schema: productSchema }]),
     MongooseModule.forFeature([{ name: 'site_products', schema: SiteProductSchema }]),
+    MongooseModule.forFeature([{ name: 'count_product', schema: CountProductSchema }]),
   ],
   controllers: [ProductController],
   providers: [ProductService, ProductRepo],

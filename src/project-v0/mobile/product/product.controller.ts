@@ -25,6 +25,11 @@ export class ProductController {
     return this.productService.countProduct(data);
   }
 
+  // @Post('/save-countProduct')
+  // async savecountProduct(@Body() data: CountProductsDto){
+  //   return this.productService.countProduct(data);
+  // }
+
 
   // @Post('/receiveAllProducts')
   // async receiveAllProducts(@Body() data: AllProductsDto) {

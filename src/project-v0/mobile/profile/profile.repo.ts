@@ -47,36 +47,18 @@ export class ProfileRepo {
   async createProfile(data: any): Promise<any> {
     let result: any = {};
     try {
-      const Dates = {
+      const Datas = {
         phone_number: data.phone_number,
         username: data.username,
         password: data.password,
         created_date: new Date(),
         oo: data.oo,
       };
-      const saveData = new this.profileModel(Dates);
+      const saveData = new this.profileModel(Datas);
       const rsSaveModalHis = await saveData.save();
 
       result.res_data = rsSaveModalHis;
     } catch (error) {}
     return result;
-  }
-
-  async loginUser(username: String, password: String) {
-    return await this.profileModel
-      .aggregate([
-        {
-          $match: {
-            username: username,
-            password: password,
-          },
-        },
-        {
-          $project: {
-            phone_number: '$phone_number',
-          },
-        },
-      ])
-      .exec();
   }
 }

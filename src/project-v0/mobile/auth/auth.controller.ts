@@ -19,13 +19,6 @@ export class AuthController {
   async loginMobile(@Body() data: loginDto) {
     return await this.authService.loginMobile(data);
   }
-  @Get('login/:username/:password')
-  async loginByusername(
-    @Param('username') username: String,
-    @Param('password') password: String,
-  ) {
-    return await this.authService.getloginMobile(username, password);
-  }
 
   @Post('profile-save')
   async createProfile(@Body() data: saveUserDto) {
