@@ -79,6 +79,7 @@ export class ProductRepo {
         item_qty: data.item_qty,
         is_count: true,
         count_date: new Date(),
+        update_date: new Date(),
       };
       const saveData = new this.CountProductModel(Data);
       const rsSaveModalHis = await saveData.save();
@@ -114,6 +115,7 @@ export class ProductRepo {
           $project: {
             item_desc1: '$item_desc1',
             item_qty: '$item_qty',
+            item_id: '$item_id',
             count_date: {
               $dateToString: {
                   format: "%d/%m/%Y %H:%M",
@@ -123,7 +125,8 @@ export class ProductRepo {
             name: { $concat: ['$firstname', ' ', '$lastname'] },
           },
         },
-      ]).exec();
+      ]).sort({ update_date: -1 })
+      .exec();
       return rs;
     }
     catch(error) {
