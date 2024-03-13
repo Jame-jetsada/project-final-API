@@ -86,7 +86,20 @@ export class ProductRepo {
     catch (error) {
       console.log("error: " + error);
     }
+  }
 
+  async getCountProductbyItemSiteid(site_id: String, item_id: String){
+    try{
+      const rsCountProduct = await this.CountProductModel.findOne({
+        site_id: site_id,
+        item_id: item_id
+      }).exec();
+      return rsCountProduct;
+    }
+    catch (error) {
+      console.log("error: " + error);
+      
+    }
   }
 
 
