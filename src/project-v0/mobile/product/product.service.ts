@@ -49,15 +49,17 @@ export class ProductService {
     return result;
   }
 
-  async countProduct(data: CountProductsDto){
-    let result:any = {};
-    try{ 
+  async countProduct(data: CountProductsDto) {
+    let result: any = {};
+    try {
       const getSiteProducts = await this.productRepo.getSiteProductsBySiteId(data.site_id, data.item_id);
-      if(!getSiteProducts){
+      const rsCount = await this.productRepo.getCountProductbyItemSiteid(data.site_id, data.item_id)
+      
+      if (!getSiteProducts) {
         result.res_code = 'E101';
         result.res_msg = 'fail';
       }
-      else{
+      else {
         const saveCount = {
           item_id: data.item_id,
           item_desc1: getSiteProducts.itm_desc1,
@@ -68,10 +70,16 @@ export class ProductService {
           firstname: data.firstname,
           lastname: data.lastname,
         }
-        const savecountProduct = await this.productRepo.createCountProduct(saveCount);
-        result.res_code = '000';
-        result.res_msg = 'success';
-      } 
+        if (rsCount) {
+          result.res_code = 'E102';
+          result.res_msg = 'again';
+        }
+        else {
+          const savecountProduct = await this.productRepo.createCountProduct(saveCount);
+          result.res_code = '000';
+          result.res_msg = 'success';
+        }
+      }
     }
     catch (error) {
       console.log('error');
