@@ -17,7 +17,7 @@ export class ProductService {
     return result;
   }
 
-  async getProductById(id: String) {
+  async getProductById(id: String, site_id: String) {
     let result: any = {};
     try {
       const rsProfileById = await this.productRepo.getProductById(id);
@@ -25,6 +25,12 @@ export class ProductService {
         result.res_code = 'E101';
         result.res_msg = 'fail';
       } else {
+        const rsCount = await this.productRepo.getCountProductbyItemSiteid(site_id, rsProfileById[0].Itm_id)
+        if (rsCount) {
+          result.res_code = 'E102';
+          result.res_msg = 'again';
+          return result;  
+        }
         result.res_code = '000';
         result.res_msg = 'success';
         result.datas = rsProfileById;
@@ -83,6 +89,37 @@ export class ProductService {
     }
     catch (error) {
       console.log('error');
+    }
+    return result;
+  }
+
+  async getCountProductAll(site_id: String){
+    let result:any = {};
+    try{
+      const rsProductAll = await this.productRepo.getCountProductAllBySiteid(site_id);
+      const countAllSite = await this.productRepo.countSiteProductsBysiteId(site_id);
+      result.res_code = '000';
+      result.res_msg = 'success';
+      result.CountAllSite = countAllSite;
+      result.CountedProduct = rsProductAll.length;
+      result.datas = rsProductAll;
+    }
+    catch(error) {
+      console.log("Error: " + error);
+      
+    }
+    return result;
+  }
+
+  async deleteCountProduct(id: String){
+    let result:any = {};
+    try{
+      const deleteCountProduct = await this.productRepo.deleteCountProductByid(id);
+      result.res_code = '000';
+      result.res_msg = 'success';
+    }
+    catch(error) {
+      console.log("Error: " + error);
     }
     return result;
   }

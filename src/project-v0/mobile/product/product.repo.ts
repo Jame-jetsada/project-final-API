@@ -102,5 +102,57 @@ export class ProductRepo {
     }
   }
 
+  async getCountProductAllBySiteid(site_id: String){
+    try{
+      const rs = await this.CountProductModel.aggregate([
+        {
+          $match: {
+            site_id: site_id,
+          },
+        },
+        {
+          $project: {
+            item_desc1: '$item_desc1',
+            item_qty: '$item_qty',
+            count_date: {
+              $dateToString: {
+                  format: "%d/%m/%Y %H:%M",
+                  date: "$count_date"
+              }
+          },
+            name: { $concat: ['$firstname', ' ', '$lastname'] },
+          },
+        },
+      ]).exec();
+      return rs;
+    }
+    catch(error) {
+      console.log("error: " + error);
+    }
+  }
+
+  async countSiteProductsBysiteId(site_id: String){
+    try{
+      const rs = await this.siteProductModel.find({
+        site_id: site_id,
+      }).exec();
+      return rs.length;
+    }
+    catch(error) {
+      console.log("error: " + error);
+    }
+  }
+
+  async deleteCountProductByid(id: String){
+    try{
+      const rs = await this.CountProductModel.findOneAndDelete({
+        _id: id,
+      }).exec();
+    }
+    catch(error) {
+      console.log("error: " + error);
+      
+    }
+  }
 
 }
