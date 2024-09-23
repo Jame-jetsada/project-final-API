@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepo } from './product.repo';
 import { CountProductsDto } from './product.dto';
+import { BdsService } from 'src/project-v0/common/util/bds.service';
 
 @Injectable()
 export class ProductService {
-  constructor(private productRepo: ProductRepo) { }
+  constructor(
+    private productRepo: ProductRepo,
+    private readonly bdsService: BdsService,
+  ) { }
 
   async getProductAll() {
     let result: any = {};
@@ -12,7 +16,7 @@ export class ProductService {
       const rsProfile = await this.productRepo.getProduct();
       result.res_code = '000';
       result.res_msg = 'success';
-      result.datas = rsProfile;
+      result.data = rsProfile;
     } catch (error) { }
     return result;
   }
@@ -33,7 +37,7 @@ export class ProductService {
         }
         result.res_code = '000';
         result.res_msg = 'success';
-        result.datas = rsProfileById;
+        result.data = rsProfileById;
       }
     } catch (error) {
       console.log('error');
@@ -81,7 +85,7 @@ export class ProductService {
           result.res_msg = 'again';
         }
         else {
-          const savecountProduct = await this.productRepo.createCountProduct(saveCount);
+          const saveCountProduct = await this.productRepo.createCountProduct(saveCount);
           result.res_code = '000';
           result.res_msg = 'success';
         }
@@ -102,7 +106,7 @@ export class ProductService {
       result.res_msg = 'success';
       result.CountAllSite = countAllSite;
       result.CountedProduct = rsProductAll.length;
-      result.datas = rsProductAll;
+      result.data = rsProductAll;
     }
     catch(error) {
       console.log("Error: " + error);
@@ -122,5 +126,20 @@ export class ProductService {
       console.log("Error: " + error);
     }
     return result;
+  }
+
+  async getShelfProduct(site_id: string) {
+    try {
+      const rsSite = await this.productRepo.getSiteBySiteId(site_id);
+      const rsShelf = await this.productRepo.getShelfBySite(rsSite.Site_Plan_Type);
+      return {
+        res_code: '000',
+        res_msg: 'success',
+        data: rsShelf
+      }
+    }
+    catch (error) {
+      console.log("Error: " + error);
+    }
   }
 }

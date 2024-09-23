@@ -11,7 +11,7 @@ export class ProductController {
   }
 
   @Get('/getProductById/:Id/:site_id')
-  async getProductById(@Param('Id') Id: String, @Param('site_id') site_id: String) {
+  async getProductById(@Param('Id') Id: string, @Param('site_id') site_id: string) {
     return await this.productService.getProductById(Id, site_id);
   }
 
@@ -26,13 +26,18 @@ export class ProductController {
   }
 
   @Get('/getCountProductAll/:site_id')
-  async getCountProductAll(@Param('site_id') site_id: String) {
+  async getCountProductAll(@Param('site_id') site_id: string) {
     return await this.productService.getCountProductAll(site_id);
   }
 
   @Delete('/deleteCountProduct/:id')
-  async deleteCountProduct(@Param('id') id: String){
+  async deleteCountProduct(@Param('id') id: string){
     return this.productService.deleteCountProduct(id);
+  }
+
+  @Get('/get-shelf-product/:site_id')
+  async getShelfProduct(@Param('site_id') site_id: string) {
+    return await this.productService.getShelfProduct(site_id);
   }
 
   // @Post('/save-countProduct')

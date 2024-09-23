@@ -14,13 +14,13 @@ export const CountProductSchema = new mongoose.Schema({
 });
 
 export interface CountProduct extends Document {
-  item_id: String;
-  item_desc1: String;
-  site_id: String;
-  site_desc: String;
-  onhand_balance_qty: Number;
-  item_qty: Number;
-  is_count: Boolean;
+  item_id: string;
+  item_desc1: string;
+  site_id: string;
+  site_desc: string;
+  onhand_balance_qty: number;
+  item_qty: number;
+  is_count: boolean;
   count_date: Date;
   update_date: Date;
 }

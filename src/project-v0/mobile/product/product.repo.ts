@@ -3,7 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from 'src/model/product.model';
 import { SiteProduct } from 'src/model/site_products.model';
-import { CountProduct } from 'src/model/count_productg';
+import { CountProduct } from 'src/model/count_product.model';
+import { sitelist } from 'src/model/sitelist.model';
+import { ItemPositionPlanType } from 'src/model/item_position_master.model';
 
 @Injectable()
 export class ProductRepo {
@@ -11,6 +13,9 @@ export class ProductRepo {
     @InjectModel('products') private readonly productModel: Model<Product>,
     @InjectModel('site_products') private readonly siteProductModel: Model<SiteProduct>,
     @InjectModel('count_product') private readonly CountProductModel: Model<CountProduct>,
+    @InjectModel('sitelists') private readonly siteListModel: Model<sitelist>,
+    @InjectModel('item_position_plan_types') private readonly itemPositionPlanTypeModel: Model<ItemPositionPlanType>,
+
   ) { }
   async getProduct() {
     return await this.productModel.find();
@@ -59,7 +64,7 @@ export class ProductRepo {
       return rs;
     }
     catch (error) {
-      console.log("Error: " + error);
+      console.log("Error: getSiteProductsBySiteId" + error);
 
     }
   }
@@ -85,7 +90,7 @@ export class ProductRepo {
       const rsSaveModalHis = await saveData.save();
     }
     catch (error) {
-      console.log("error: " + error);
+      console.log("error: createCountProduct" + error);
     }
   }
 
@@ -98,7 +103,7 @@ export class ProductRepo {
       return rsCountProduct;
     }
     catch (error) {
-      console.log("error: " + error);
+      console.log("error: getCountProductbyItemSiteid" + error);
       
     }
   }
@@ -130,7 +135,7 @@ export class ProductRepo {
       return rs;
     }
     catch(error) {
-      console.log("error: " + error);
+      console.log("error: getCountProductAllBySiteid" + error);
     }
   }
 
@@ -142,7 +147,7 @@ export class ProductRepo {
       return rs.length;
     }
     catch(error) {
-      console.log("error: " + error);
+      console.log("error: countSiteProductsBysiteId" + error);
     }
   }
 
@@ -153,8 +158,46 @@ export class ProductRepo {
       }).exec();
     }
     catch(error) {
-      console.log("error: " + error);
+      console.log("error: deleteCountProductByid" + error);
       
+    }
+  }
+
+  async getSiteBySiteId(site_id: string){
+    try{
+      return await this.siteListModel.findOne({
+        Site_ID: Number(site_id)
+      }).exec();
+    }
+    catch(error) {
+      console.log("error: getSiteBySiteId" + error);
+    }
+  }
+
+  async getShelfBySite(SitePlanType: string) {
+    try {
+      const rs = await this.itemPositionPlanTypeModel.aggregate([
+        {
+          $match: {
+            Plan_Type_ID: SitePlanType,
+          },
+        },
+        {
+          $group: {
+            _id: "$Item_Position", 
+          },
+        },
+        {
+          $sort: {
+            _id: 1, 
+          },
+        },
+      ]).exec();
+  
+      const itemPositions = rs.map(item => item._id);
+      return itemPositions;
+    } catch (error) {
+      console.log("error: getShelfBySite" + error);
     }
   }
 
