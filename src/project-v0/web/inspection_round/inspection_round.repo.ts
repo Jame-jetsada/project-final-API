@@ -19,4 +19,18 @@ export class InspectionRoundRepo {
             console.log("error: InspectionRoundRepo.createInspectionRound" + error);
         }
     }
+
+    async getInspectionRound(){
+        try {
+            return await this.InspectionRoundModel.findOne(
+                {
+                    start_date: { $lte: new Date() },
+                    end_date: { $gte: new Date() },
+                }
+            ).lean().exec();
+        }
+        catch(error){
+            console.log("error: InspectionRoundRepo.getInspectionRound" + error);
+        }
+    }
 }

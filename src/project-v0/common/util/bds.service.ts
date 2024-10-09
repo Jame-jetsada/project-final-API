@@ -10,7 +10,7 @@ export class BdsService {
     private http: HttpService,
   ) {}
 
-  getInventoryOnhandBalance(itemList: [], siteList: []) {
+  async getInventoryOnhandBalance(itemList: [], siteList: []) {
     const url = KEY.BDS_KEY.url + '/InventoryOnhandBalance';
     const key = KEY.BDS_KEY.key;
     const headersRequest = {

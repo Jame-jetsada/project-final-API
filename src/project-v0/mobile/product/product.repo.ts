@@ -5,16 +5,17 @@ import { Product } from 'src/model/product.model';
 import { SiteProduct } from 'src/model/site_products.model';
 import { CountProduct } from 'src/model/count_product.model';
 import { sitelist } from 'src/model/sitelist.model';
-import { ItemPositionPlanType } from 'src/model/item_position_master.model';
+import { Item_master } from 'src/model/item_master.model';
+import { item_position_plan_type } from 'src/model/item_position_plan_type.modle';
 
 @Injectable()
 export class ProductRepo {
   constructor(
     @InjectModel('products') private readonly productModel: Model<Product>,
-    @InjectModel('site_products') private readonly siteProductModel: Model<SiteProduct>,
+    @InjectModel('item_masters') private readonly itemMasterModel: Model<Item_master>,
     @InjectModel('count_product') private readonly CountProductModel: Model<CountProduct>,
     @InjectModel('sitelists') private readonly siteListModel: Model<sitelist>,
-    @InjectModel('item_position_plan_types') private readonly itemPositionPlanTypeModel: Model<ItemPositionPlanType>,
+    @InjectModel('item_position_plan_types') private readonly itemPositionPlanTypeModel: Model<item_position_plan_type>,
 
   ) { }
   async getProduct() {
@@ -41,53 +42,17 @@ export class ProductRepo {
       ])
       .exec();
   }
-  async createProductByArray(data: any[]): Promise<any> {
-    let result: any = {};
-    try {
-      const products = data.map(productData => new this.siteProductModel(productData));
-      const savedProducts = await Promise.all(products.map(product => product.save()));
 
-      result.res_data = savedProducts;
-    } catch (error) {
-      console.log(error);
-      result.error = error.message;
-    }
-    return result;
-  }
-
-  async getSiteProductsBySiteId(siteId: String, itemId: String) {
-    try {
-      const rs = await this.siteProductModel.findOne({
-        site_id: siteId,
-        itm_id: itemId
-      }).exec();
-      return rs;
-    }
-    catch (error) {
-      console.log("Error: getSiteProductsBySiteId" + error);
-
-    }
-  }
   async createCountProduct(data: any) {
     try {
-      const Data = {
-        username: data.username,
-        password: data.password,
-        created_date: new Date(),
-        item_id: data.item_id,
-        item_desc1: data.item_desc1,
-        firstname: data.firstname,
-        lastname: data.lastname,
-        site_id: data.site_id,
-        site_desc: data.site_desc,
-        onhand_balance_qty: data.onhand_balance_qty,
-        item_qty: data.item_qty,
-        is_count: true,
-        count_date: new Date(),
-        update_date: new Date(),
-      };
-      const saveData = new this.CountProductModel(Data);
-      const rsSaveModalHis = await saveData.save();
+      await this.CountProductModel.updateOne(
+        { 
+          item_id: data.item_id,
+          inspection_code: data.inspection_code
+        },
+        { $set: data },
+        { upsert: true }
+      ).exec();
     }
     catch (error) {
       console.log("error: createCountProduct" + error);
@@ -108,46 +73,44 @@ export class ProductRepo {
     }
   }
 
-  async getCountProductAllBySiteid(site_id: String){
-    try{
-      const rs = await this.CountProductModel.aggregate([
+  async getCountProductAllBySiteIdAndInspectionCode(site_id: string, inspectionCode: string, item_position?: string) {
+    try {
+      const matchCriteria: any = {
+        site_id: site_id,
+        inspection_code: inspectionCode,
+      };
+  
+      if (item_position) {
+        matchCriteria.item_position = item_position;
+      }
+  
+      return await this.CountProductModel.aggregate([
         {
-          $match: {
-            site_id: site_id,
-          },
+          $match: matchCriteria, 
+        },
+        {
+          $sort: { update_date: -1 },
         },
         {
           $project: {
-            item_desc1: '$item_desc1',
-            item_qty: '$item_qty',
             item_id: '$item_id',
-            count_date: {
+            item_desc1: '$item_desc1',
+            update_date: {
               $dateToString: {
-                  format: "%d/%m/%Y %H:%M",
-                  date: "$count_date"
-              }
-          },
-            name: { $concat: ['$firstname', ' ', '$lastname'] },
+                format: "%d/%m/%Y %H:%M",
+                date: {
+                  $add: ['$update_date', 7 * 60 * 60 * 1000],
+                },
+              },
+            },
+            item_qty: '$item_qty',
+            onhand_balance_qty: '$onhand_balance_qty',
+            difference_count: '$difference_count',
           },
         },
-      ]).sort({ update_date: -1 })
-      .exec();
-      return rs;
-    }
-    catch(error) {
-      console.log("error: getCountProductAllBySiteid" + error);
-    }
-  }
-
-  async countSiteProductsBysiteId(site_id: String){
-    try{
-      const rs = await this.siteProductModel.find({
-        site_id: site_id,
-      }).exec();
-      return rs.length;
-    }
-    catch(error) {
-      console.log("error: countSiteProductsBysiteId" + error);
+      ]).exec();
+    } catch (error) {
+      console.log("error: getCountProductAllBySiteIdAndInspectionCode", error);
     }
   }
 
@@ -197,7 +160,49 @@ export class ProductRepo {
       const itemPositions = rs.map(item => item._id);
       return itemPositions;
     } catch (error) {
-      console.log("error: getShelfBySite" + error);
+      console.log("error: ProductRepo.getShelfBySite" + error);
+    }
+  }
+
+  async getItemMastersByItemId(itemId: string){
+    try {
+      return await this.itemMasterModel.findOne({Itm_ID: itemId}).lean().exec();
+    }
+    catch (error) {
+      console.log("error: ProductRepo.getItemMastersByItemId", error);
+    }
+  }
+
+  async getItemMastersByItemBarCode(item_barcode: string){
+    try {
+      return await this.itemMasterModel.findOne({Itm_BarCode: item_barcode}).lean().exec();
+    }
+    catch (error) {
+      console.log("error: ProductRepo.getItemMastersByItemBarCode", error);
+    }
+  }
+
+  async getProductCountByItemIdAndInspectionCode(itemId: string, inspectorCode: string){
+    try {
+      return await this.CountProductModel.findOne({
+        item_id: itemId,
+
+      }).lean().exec();
+    }
+    catch(error){
+      console.log("error: ProductRepo.getProductCountByItemIdAndInspectionCode", error);
+    }
+  }
+
+  async getPositionByItemIdAndSitePlanType(itemId: string, sitePlanType: string){
+    try {
+      return await this.itemPositionPlanTypeModel.findOne({
+        Item_ID: itemId,
+        Plan_Type_ID: sitePlanType
+      }).lean().exec();
+    }
+    catch(error){
+      console.log("error: ProductRepo.getPositionByItemIdAndSitePlanType", error);
     }
   }
 

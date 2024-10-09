@@ -12,8 +12,17 @@ export class InspectionRoundService {
     
     async createInspectionRound(data: CreateInspectionRoundDto) {
         try {
+            const generateInspectionCode = () => {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                const month = monthNames[now.getMonth()];
+                const year = now.getFullYear();
+                return `${day}${month}${year}`;
+            };
             const saveData = {
                 inspection_name: data.inspection_name,
+                inspection_code: generateInspectionCode(),
                 start_date: data.start_date,
                 end_date: data.end_date,
                 create_date: new Date(),
@@ -27,6 +36,15 @@ export class InspectionRoundService {
         }
         catch (error) {
             console.log("Error: InspectionRoundService.createInspectionRound" + error);
+        }
+    }
+
+    async getInspectionRound(){
+        try {
+            return await this.inspectionRoundRepo.getInspectionRound();
+        }
+        catch (error) {
+            console.log("Error: InspectionRoundService.getInspectionRound" + error);
         }
     }
 

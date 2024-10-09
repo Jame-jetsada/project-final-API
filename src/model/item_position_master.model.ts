@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-export const ItemPositionPlanTypeSchema = new mongoose.Schema({
+export const ItemPositionMasterSchema = new mongoose.Schema({
     Item_Position_Code: String,
     Item_Position_Name: String,
     Item_Position_Desc: String,
@@ -10,7 +10,7 @@ export const ItemPositionPlanTypeSchema = new mongoose.Schema({
     Item_Position_Transf_Zone: String,
 });
 
-export interface ItemPositionPlanType extends Document {
+export interface ItemPositionMaster extends Document {
     Item_Position_Code: string,
     Item_Position_Name: string,
     Item_Position_Desc: string,
