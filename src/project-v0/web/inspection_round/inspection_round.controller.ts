@@ -10,4 +10,10 @@ export class InspectionRoundController {
     async createInspectionRound(@Body() data: CreateInspectionRoundDto){
         return await this.inspectionRoundService.createInspectionRound(data);
     }
+
+    @Get('/check-inspection-round')
+    async checkInspectionRound() {
+        return await this.inspectionRoundService.checkInspectionRound();
+  }
+
 }

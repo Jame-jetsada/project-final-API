@@ -18,3 +18,7 @@ export class GetCountProductDto {
     filters_item_position: string;
 }
 
+export class getItemByShelfDto {
+    site_id: string;
+    item_position: string;
+}

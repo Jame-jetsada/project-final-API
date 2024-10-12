@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepo } from './product.repo';
-import { CountProductsDto, GetCountProductDto, GetItemDetailDto } from './product.dto';
+import { CountProductsDto, GetCountProductDto, getItemByShelfDto, GetItemDetailDto } from './product.dto';
 import { BdsService } from 'src/project-v0/common/util/bds.service';
 import { InspectionRoundService } from 'src/project-v0/web/inspection_round/inspection_round.service';
 
@@ -43,13 +43,19 @@ export class ProductService {
   async countProduct(data: CountProductsDto) {
     let result: any = {};
     try {
-      const rsSite = await this.productRepo.getSiteBySiteId(data.site_id);
       const rsInspectionRound = await this.inspectionRoundService.getInspectionRound();
       if(!rsInspectionRound){
         return {
           res_code: 'E110',
           res_msg: 'ไม่อยู่ในช่วงดำเนินการนับ',
         }
+      }
+      const rsSite = await this.productRepo.getSiteBySiteId(data.site_id);
+      if(!rsSite){
+        return {
+          res_code: 'E102',
+          res_msg: 'ไม่มีสาขาอยู่ในระบบ',
+        };
       }
       let itemList: any = [];
       let siteList: any = [];
@@ -108,11 +114,11 @@ export class ProductService {
           res_msg: 'ไม่อยู่ในช่วงดำเนินการนับ',
         }
       }
-      const rsProductAll = await this.productRepo.getCountProductAllBySiteIdAndInspectionCode(data.site_id, rsInspectionRound.inspection_code, data.filters_item_position);
+      const rsCountProduct = await this.productRepo.getCountProductAllBySiteIdAndInspectionCode(data.site_id, rsInspectionRound.inspection_code, data.filters_item_position);
+
       result.res_code = '000';
       result.res_msg = 'success';
-      result.CountedProduct = rsProductAll.length;
-      result.data = rsProductAll;
+      result.data = rsCountProduct;
     }
     catch (error) {
       console.error("Error InspectionRoundService.getCountProduct:", error);
@@ -140,6 +146,12 @@ export class ProductService {
   async getShelfProduct(site_id: string) {
     try {
       const rsSite = await this.productRepo.getSiteBySiteId(site_id);
+      if(!rsSite){
+        return {
+          res_code: 'E102',
+          res_msg: 'ไม่มีสาขาอยู่ในระบบ',
+        };
+      }
       const rsShelf = await this.productRepo.getShelfBySite(rsSite.Site_Plan_Type);
       return {
         res_code: '000',
@@ -181,7 +193,7 @@ export class ProductService {
       if (!rsSite) {
         return {
           res_code: 'E102',
-          res_msg: 'ไม่พบข้อมูลสถานที่',
+          res_msg: 'ไม่มีสาขาอยู่ในระบบ',
         };
       }
   
@@ -214,5 +226,78 @@ export class ProductService {
       };
     }
   }
+
+  async getItemByShelf(data: getItemByShelfDto) {
+    try {
+      const rsInspectionRound = await this.inspectionRoundService.getInspectionRound();
+      if (!rsInspectionRound) {
+        return {
+          res_code: 'E110',
+          res_msg: 'ไม่อยู่ในช่วงดำเนินการนับ',
+        };
+      }
+  
+      const rsSite = await this.productRepo.getSiteBySiteId(data.site_id);
+      if (!rsSite) {
+        return {
+          res_code: 'E102',
+          res_msg: 'ไม่มีสาขาอยู่ในระบบ',
+        };
+      }
+      const rsCountProduct = await this.productRepo.getCountProductAllBySiteIdAndInspectionCode(data.site_id, rsInspectionRound.inspection_code);
+      const mapCountProduct = rsCountProduct.map(item => item.item_id);
+      const rsItemShelf = await this.productRepo.getPositionBySitePlanTypeItemPosition(rsSite.Site_Plan_Type, data.item_position);
+      const filteredItems = rsItemShelf.filter(item => !mapCountProduct.includes(item.item_id));
+      return {
+        res_code: '000',
+        res_msg: 'success',
+        data: filteredItems,
+      };
+    } catch (error) {
+      console.error("Error InspectionRoundService.getItemByShelf:", error);
+      return {
+        res_code: 'E500',
+        res_msg: 'เกิดข้อผิดพลาดในการประมวลผล',
+      };
+    }
+  }
+
+  async getTotalCountAndCounted(site_id: string){
+    try {
+      const rsInspectionRound = await this.inspectionRoundService.getInspectionRound();
+      if (!rsInspectionRound) {
+        return {
+          res_code: 'E110',
+          res_msg: 'ไม่อยู่ในช่วงดำเนินการนับ',
+        };
+      }
+      const rsSite = await this.productRepo.getSiteBySiteId(site_id);
+      if(!rsSite){
+        return {
+          res_code: 'E102',
+          res_msg: 'ไม่มีสาขาอยู่ในระบบ',
+        };
+      }
+      const rsAllItemSite = await this.productRepo.getAllItemSite(rsSite.Site_Plan_Type);
+      const rsCountProduct = await this.productRepo.getCountProductAllBySiteIdAndInspectionCode(site_id, rsInspectionRound.inspection_code);
+      const rsText = {
+        totalCountCounted: `${rsAllItemSite.length}/${rsCountProduct.length}`,
+        round: await this.inspectionRoundService.getRound()
+      }
+      return {
+        res_code: '000',
+        res_msg: 'success',
+        data: rsText
+      }
+    }
+    catch(error){
+      console.error("Error InspectionRoundService.getTotalCountAndCounted:", error);
+      return {
+        res_code: 'E500',
+        res_msg: 'เกิดข้อผิดพลาดในการประมวลผล',
+      };
+    }
+  }
+  
   
 }

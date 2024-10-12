@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CountProductsDto, GetCountProductDto, GetItemDetailDto } from './product.dto';
+import { CountProductsDto, GetCountProductDto, getItemByShelfDto, GetItemDetailDto } from './product.dto';
 
 @Controller('project-v0/product')
 export class ProductController {
@@ -11,7 +11,12 @@ export class ProductController {
   //   return await this.productService.getProductById(Id, site_id);
   // }
 
-  @Post('/countProduct')
+  @Get('/get-item-by-shelf')
+  async getItemByShelf(@Query() query: getItemByShelfDto) {
+    return await this.productService.getItemByShelf(query);
+  }
+
+  @Post('/count-product')
   async countProduct(@Body() data: CountProductsDto){
     return this.productService.countProduct(data);
   }
@@ -20,6 +25,12 @@ export class ProductController {
   async getCountProductAll(@Query() query: GetCountProductDto) {
     return await this.productService.getCountProduct(query);
   }
+
+  @Get('/get-total-count-and-counted/:site_id')
+  async getTotalCountAndCounted(@Param('site_id') site_id: string) {
+    return await this.productService.getTotalCountAndCounted(site_id);
+  }
+
 
   // @Delete('/deleteCountProduct/:id')
   // async deleteCountProduct(@Param('id') id: string){

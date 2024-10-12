@@ -21,27 +21,27 @@ export class ProductRepo {
   async getProduct() {
     return await this.productModel.find();
   }
-  async getProductById(id: String) {
-    return await this.productModel
-      .aggregate([
-        {
-          $match: {
-            Itm_BarCode: id,
-          },
-        },
-        {
-          $project: {
-            Itm_id: '$Itm_id',
-            Product_image: "$Product_image",
-            Itm_Char: '$Itm_Char',
-            Itm_Desc1: '$Itm_Desc1',
-            Itm_Memo: '$Itm_Memo',
-            Itm_Memo_Public: '$Itm_Memo_Public',
-          },
-        },
-      ])
-      .exec();
-  }
+  // async getProductById(id: String) {
+  //   return await this.productModel
+  //     .aggregate([
+  //       {
+  //         $match: {
+  //           Itm_BarCode: id,
+  //         },
+  //       },
+  //       {
+  //         $project: {
+  //           Itm_id: '$Itm_id',
+  //           Product_image: "$Product_image",
+  //           Itm_Char: '$Itm_Char',
+  //           Itm_Desc1: '$Itm_Desc1',
+  //           Itm_Memo: '$Itm_Memo',
+  //           Itm_Memo_Public: '$Itm_Memo_Public',
+  //         },
+  //       },
+  //     ])
+  //     .exec();
+  // }
 
   async createCountProduct(data: any) {
     try {
@@ -59,19 +59,6 @@ export class ProductRepo {
     }
   }
 
-  async getCountProductbyItemSiteid(site_id: String, item_id: String){
-    try{
-      const rsCountProduct = await this.CountProductModel.findOne({
-        site_id: site_id,
-        item_id: item_id
-      }).exec();
-      return rsCountProduct;
-    }
-    catch (error) {
-      console.log("error: getCountProductbyItemSiteid" + error);
-      
-    }
-  }
 
   async getCountProductAllBySiteIdAndInspectionCode(site_id: string, inspectionCode: string, item_position?: string) {
     try {
@@ -130,7 +117,7 @@ export class ProductRepo {
     try{
       return await this.siteListModel.findOne({
         Site_ID: Number(site_id)
-      }).exec();
+      }).lean().exec();
     }
     catch(error) {
       console.log("error: getSiteBySiteId" + error);
@@ -206,4 +193,52 @@ export class ProductRepo {
     }
   }
 
+  async getPositionBySitePlanTypeItemPosition(sitePlanType: string, itemPosition: string) {
+    try {
+      return await this.itemPositionPlanTypeModel.aggregate([
+        {
+          $match: {
+            Plan_Type_ID: sitePlanType,
+            Item_Position: itemPosition
+          },
+        },
+        {
+          $lookup: {
+            from: 'item_masters',
+            localField: 'Item_ID', 
+            foreignField: 'Itm_ID', 
+            as: 'item',
+          },
+        },
+        {
+          $unwind: { path: '$item', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $project: {
+            _id: 0,
+            item_id: '$Item_ID',
+            item_desc1: '$item.Itm_Desc1',
+          },
+        },
+      ]).exec();
+    } catch (error) {
+      console.log("error: ProductRepo.getPositionBySitePlanType", error);
+    }
+  }
+
+  async getAllItemSite(SitePlanType: string) {
+    try {
+      return await this.itemPositionPlanTypeModel.aggregate([
+        {
+          $match: {
+            Plan_Type_ID: SitePlanType,
+          },
+        },
+      ]).exec();
+  
+    } catch (error) {
+      console.log("error: ProductRepo.getShelfBySite" + error);
+    }
+  }
+  
 }

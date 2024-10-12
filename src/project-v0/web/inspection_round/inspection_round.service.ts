@@ -48,4 +48,39 @@ export class InspectionRoundService {
         }
     }
 
+    async checkInspectionRound(){
+        try {
+            const rsInspectionRound = await this.inspectionRoundRepo.getInspectionRound();
+            if(!rsInspectionRound){
+                return {
+                    res_code: 'E110',
+                    res_msg: 'ไม่อยู่ในช่วงดำเนินการนับ',
+                };
+            }
+            return {
+                res_code: '000',
+                res_msg: 'success',
+            }
+        }
+        catch (error) {
+            console.log("Error: InspectionRoundService.getInspectionRound" + error);
+        }
+    }
+
+    async getRound() {
+        try {
+            const rsInspectionRound = await this.inspectionRoundRepo.getInspectionRound();
+            if(!rsInspectionRound){
+                return null;
+            }
+            const start_date = new Date(rsInspectionRound.start_date).toLocaleDateString('en-GB');
+            const end_date = new Date(rsInspectionRound.end_date).toLocaleDateString('en-GB');
+            const text = `${start_date} - ${end_date}`;
+            return text;
+        } catch (error) {
+            console.log("Error: InspectionRoundService.getRound" + error);
+        }
+    }
+    
+
 }

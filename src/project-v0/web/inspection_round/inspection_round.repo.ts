@@ -27,7 +27,7 @@ export class InspectionRoundRepo {
                     start_date: { $lte: new Date() },
                     end_date: { $gte: new Date() },
                 }
-            ).lean().exec();
+            ).sort({create_date: -1}).lean().exec();
         }
         catch(error){
             console.log("error: InspectionRoundRepo.getInspectionRound" + error);
