@@ -8,7 +8,7 @@ import { loginDto } from './auth.dto';
 export class AuthService {
     constructor(
         private authRepo: AuthRepo,
-        private utilSarvice: UtilService,
+        private utilService: UtilService,
     ) { }
 
     async saveUser(data: saveUserDto) {
@@ -17,7 +17,7 @@ export class AuthService {
             const datas = {
                 phone_number: data.phone_number,
                 username: data.username,
-                password: await this.utilSarvice.getHash(data.password),
+                password: await this.utilService.getHash(data.password),
                 site_id: data.site_id,
                 site_name: data.site_name,
                 firstname: data.firstname,
@@ -46,7 +46,7 @@ export class AuthService {
                 result.res_msg = "fail";
                 return result;
             }
-            const isCompare = await this.utilSarvice.compareHash(data.password, rsUser.password);
+            const isCompare = await this.utilService.compareHash(data.password, rsUser.password);
             if(!isCompare){
                 result.res_code = "E102";
                 result.res_msg = "fail";
@@ -55,7 +55,7 @@ export class AuthService {
             let tokenData: any ={
                 emp_id: rsUser.emp_id
             };
-            const rsToken = await this.utilSarvice.signToken(tokenData);
+            const rsToken = await this.utilService.signToken(tokenData);
             result.res_code = "000";
             result.res_msg = "success";
             result.datas = {
@@ -77,7 +77,7 @@ export class AuthService {
                 result.res_msg = "fail";
                 return result;
             }
-            const isCompare = await this.utilSarvice.compareHash(password, rsUser.password);
+            const isCompare = await this.utilService.compareHash(password, rsUser.password);
             if(!isCompare){
                 result.res_code = "E102";
                 result.res_msg = "fail";
@@ -86,7 +86,7 @@ export class AuthService {
             let tokenData: any ={
                 emp_id: rsUser.emp_id
             };
-            const rsToken = await this.utilSarvice.signToken(tokenData);
+            const rsToken = await this.utilService.signToken(tokenData);
             result.res_code = "000";
             result.res_msg = "success";
             result.datas = {

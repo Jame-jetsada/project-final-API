@@ -5,12 +5,16 @@ import { ProfileModule } from './project-v0/mobile/profile/profile.module';
 import { ProductModule } from './project-v0/mobile/product/product.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './project-v0/mobile/auth/auth.module';
+import { ProblemModule } from './project-v0/mobile/problem/problem.module';
+import { InspectionRoundModule } from './project-v0/web/inspection_round/inspection_round.module';
 
 @Module({
   imports: [
     ProfileModule,
     ProductModule,
     AuthModule,
+    ProblemModule,
+    InspectionRoundModule,
     MongooseModule.forRoot(
       'mongodb+srv://jamejetsada121:jame123456@cluster0.yvzvrxd.mongodb.net/?retryWrites=true&w=majority',
     ),
