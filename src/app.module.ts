@@ -7,17 +7,19 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './project-v0/mobile/auth/auth.module';
 import { ProblemModule } from './project-v0/mobile/problem/problem.module';
 import { InspectionRoundModule } from './project-v0/web/inspection_round/inspection_round.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // ทำให้สามารถใช้งาน config ได้ทั่วโปรเจค
+    }),
     ProfileModule,
     ProductModule,
     AuthModule,
     ProblemModule,
     InspectionRoundModule,
-    MongooseModule.forRoot(
-      'mongodb+srv://jamejetsada121:jame123456@cluster0.yvzvrxd.mongodb.net/?retryWrites=true&w=majority',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_BD),
   ],
   controllers: [AppController],
   providers: [AppService],
