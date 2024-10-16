@@ -179,8 +179,8 @@ export class ProductService {
       }
   
       const rsItem = data.item_id
-        ? await this.productRepo.getItemMastersByItemId(data.item_id)
-        : await this.productRepo.getItemMastersByItemBarCode(data.item_barcode);
+        ? await this.productRepo.getItemMastersByItemId(data.item_id) as any
+        : await this.productRepo.getItemMastersByItemBarCode(data.item_barcode) as any;
   
       if (!rsItem) {
         return {
@@ -197,7 +197,7 @@ export class ProductService {
         };
       }
   
-      const rsPosition = await this.productRepo.getPositionByItemIdAndSitePlanType(data.item_id, rsSite.Site_Plan_Type);
+      const rsPosition = await this.productRepo.getPositionByItemIdAndSitePlanType(rsItem.Itm_ID, rsSite.Site_Plan_Type);
       if (!rsPosition) {
         return {
           res_code: 'E103',
@@ -206,7 +206,7 @@ export class ProductService {
       }
   
       const dataList = {
-        item_id: data.item_id,
+        item_id: rsItem.Itm_ID,
         item_image: rsItem.Product_image,
         item_name: rsItem.Itm_Desc1,
         item_position: rsPosition.Item_Position,
